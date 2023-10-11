@@ -19,12 +19,7 @@
     <script>
         // Replace with your own Mapbox Access Token
         let params = (new URL(document.location)).searchParams;
-        let raw_data = JSON.parse(params.get("l"));
-        let data = [];
-        raw_data.forEach(coords => {
-            data.push([coords[1], coords[0]])
-        });
-
+        let data = JSON.parse(params.get("l"));
         console.log(data);
 
         mapboxgl.accessToken = 'pk.eyJ1IjoibGljYTg4IiwiYSI6ImNsbmxiZ3prZzBwb2Yyc3BtNGxzNTNzdmEifQ.DVf5b_-9yup8YZFlG5wQeg';
