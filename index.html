@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+    <title>Restrictive Racial Covenants Map</title>
+    <style>
+        /* Add some styles for the map container */
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id='map'></div>
+
+    <script>
+        // Replace with your own Mapbox Access Token
+        let params = (new URL(document.location)).searchParams;
+        let raw_data = JSON.parse(params.get("l"));
+        let data = [];
+        raw_data.forEach(coords => {
+            data.push([coords[1], coords[0]])
+        });
+
+        console.log(data);
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibGljYTg4IiwiYSI6ImNsbmxiZ3prZzBwb2Yyc3BtNGxzNTNzdmEifQ.DVf5b_-9yup8YZFlG5wQeg';
+        // mapboxgl.accessToken = '';
+        // Define the list of coordinates (longitude, latitude)
+        const userDefined = [
+            [-73.98567, 40.748817],  // Example coordinate 1
+            [-73.96537, 40.802301],  // Example coordinate 2
+            // Add more coordinates as needed
+        ];
+        coordinates = userDefined.concat(data);
+
+        // Initialize the map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11', // You can choose a different style
+            center: coordinates[2], // Set the initial center of the map
+            zoom: 10, // Set the initial zoom level
+        });
+        map.addControl(new mapboxgl.NavigationControl());
+
+        // Add markers to the map for each coordinate
+        coordinates.forEach(coord => {
+            new mapboxgl.Marker()
+                .setLngLat(coord)
+                .addTo(map);
+        });
+    </script>
+</body>
+</html>
