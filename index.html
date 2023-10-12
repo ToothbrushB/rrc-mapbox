@@ -44,7 +44,7 @@
             zoom: 10, // Set the initial zoom level
         });
         map.addControl(new mapboxgl.NavigationControl());
-
+        map.addControl(new mapboxgl.FullscreenControl());
         // Add markers to the map for each coordinate
         coordinates.forEach(coord => {
             new mapboxgl.Marker()
