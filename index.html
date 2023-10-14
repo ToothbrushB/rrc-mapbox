@@ -49,7 +49,7 @@
         coordinates.forEach(coord => {
             new mapboxgl.Marker()
                 .setLngLat(coord)
-                .setPopup(new mapboxgl.Popup().setHTML(`<p>${coord[2]}</p>`))
+                .setPopup(new mapboxgl.Popup().setHTML(`<p>${coord[2].join(", ")}</p>`))
                 .addTo(map);
         });
     </script>
