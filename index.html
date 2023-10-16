@@ -11,6 +11,22 @@
             width: 100%;
             height: 400px;
         }
+        .image-cropper {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        img {
+            display: inline;
+            margin: 0 auto;
+            height: 100px;
+            width: 100px;
+            object-fit: cover;
+            object-position: center -10px;
+        }
     </style>
 </head>
 <body>
@@ -30,9 +46,9 @@
 
         let lat = 0;
         let lon = 0;
-        data.forEach(coord => {
-            lon+=coord[0];
-            lat+=coord[1];
+        data.forEach(r => {
+            lon+=r.lon;
+            lat+=r.lat;
         });
 
         center = [lon/data.length, lat/data.length];
@@ -46,10 +62,20 @@
         map.addControl(new mapboxgl.NavigationControl());
         map.addControl(new mapboxgl.FullscreenControl());
         // Add markers to the map for each coordinate
-        coordinates.forEach(coord => {
+        data.forEach(r => {
+            html = ""
+            r.roster.forEach(p => {
+                html += `
+                <div class="image-cropper">
+                    <img src=${p.photo} alt="Photo of ${p.name}">
+                </div>
+                <p>${p.name}, Grade ${p.grade}</p>
+                <br/>
+                `
+            })
             new mapboxgl.Marker()
-                .setLngLat(coord)
-                .setPopup(new mapboxgl.Popup().setHTML(`<p>${coord[2].join(", ")}</p>`))
+                .setLngLat([r.lon, r.lat])
+                .setPopup(new mapboxgl.Popup().setHTML(html))
                 .addTo(map);
         });
     </script>
