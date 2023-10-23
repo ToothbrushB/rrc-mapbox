@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+    <title>Restrictive Racial Covenants Map</title>
+    <style>
+        /* Add some styles for the map container */
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+        .image-cropper {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        img {
+            display: inline;
+            margin: 0 auto;
+            height: 100px;
+            width: 100px;
+            object-fit: cover;
+            object-position: center -10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id='title'>Breck homes that have RRCs on them</h1>
+    <div id='map'></div>
+    <p>The homes on this map are homes where the directory address matches an address in the Mapping Prejudice database.</p>
+    <p>Although not represented on the map, faces/names were manually processed to get a better idea of the racial demographics of this group. This process is very subjective, but we feel that it resulted in a more nuanced view that took mixed race people into account. In the end, we found that the group was about 80% white.</p>
+    <p>Each pin on the map represents an address. Click on the pin to get a list of the students who are associated with the address, their grades, and their estimated race/gender.</p>
+    <p>Disclaimer: Race/gender data was estimated by the FairFace machine learning model using Veracross photos. As a result, there are errors and gaps in this aspect of the data. Self-reported information would be much more accurate.</p>
+    <h3>Created using:</h3>
+    <ul>
+        <li>Breck School. "Veracross Student Directory." Accessed 16 Oct. 2023.</li>
+        <li>Ehrman-Solberg, Kevin; Petersen, Penny; Mills, Marguerite; Delegard, Kirsten; Mattke, Ryan. (2020). Racial Covenants in Hennepin County. Retrieved from the Data Repository for the University of Minnesota, https://doi.org/10.13020/a88t-yb14.</li>
+        <li>Karkkainen, Kimmo and Joo, Jungseock. "FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age for Bias Measurement and Mitigation."  *Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision*, 2021. Pg 1528-1558</li>
+        <li>Mapbox GL JS API</li>
+        <li>Li, Rebecca. Research/processing of face/name data.<span style="font-size: xx-small;"> this is my mom</span></li>
+    </ul>
+    <script>
+        let embeddedData = [
+    {
+        "lon": -93.372328,
+        "lat": 44.906334,
+        "roster": [
+            {
+                "name": "Ava Allingham",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324643/breck/person_photos/cbnvqi6ttmkkgzzytobk.jpg",
+                "grade": "11",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Gray Allingham",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141388/breck/person_photos/fs6brxqws59ucy4ixckj.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.334617,
+        "lat": 44.968663,
+        "roster": [
+            {
+                "name": "Duncan Armour",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324656/breck/person_photos/lwzixibm9jstfezfpnfr.jpg",
+                "grade": "11",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.324718,
+        "lat": 45.029891,
+        "roster": [
+            {
+                "name": "Abby Bannister",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141507/breck/person_photos/qhrbe2xdxukftle4ici0.jpg",
+                "grade": "1",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "David Bannister",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141512/breck/person_photos/krgki7qs7umz6g0rtrul.jpg",
+                "grade": "1",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Lucy Bannister",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141500/breck/person_photos/uz7iijcgkujoj6xciwvs.jpg",
+                "grade": "2",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.348655,
+        "lat": 44.974618,
+        "roster": [
+            {
+                "name": "Aj Bean",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141384/breck/person_photos/acfnmcjvy4ldytdzutyk.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Danielle Bean",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141386/breck/person_photos/lmmzsrrbx3riyiu0xg9q.jpg",
+                "grade": "6",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.342648,
+        "lat": 44.914951,
+        "roster": [
+            {
+                "name": "Stella Birdsong",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324654/breck/person_photos/mkn2og7nwppx46fjasdx.jpg",
+                "grade": "10",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.316618,
+        "lat": 44.954113,
+        "roster": [
+            {
+                "name": "Carley Burns",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141391/breck/person_photos/re3r6huevoic57xtwxcv.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Elaina Burns",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141394/breck/person_photos/hziyvywzgsabrvsgiadk.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.329432,
+        "lat": 44.97134,
+        "roster": [
+            {
+                "name": "Cayla Cavanaugh",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324653/breck/person_photos/xcdtr730tpji1o88ioei.jpg",
+                "grade": "10",
+                "race": "Asian",
+                "gender": "Female"
+            },
+            {
+                "name": "Hannah Cavanaugh",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324653/breck/person_photos/avn2q3qwp3cpbrbs1ywj.jpg",
+                "grade": "10",
+                "race": "Asian",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.330464,
+        "lat": 44.918924,
+        "roster": [
+            {
+                "name": "Liam Cavanaugh",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324647/breck/person_photos/luirgcmltfcaakhpcrvg.jpg",
+                "grade": "11",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Michael Cavanaugh",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141380/breck/person_photos/hyfmvpvntaew8hgrnme3.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Ryan Cavanaugh",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141381/breck/person_photos/r4nznzkh2xxnvrfl0cbq.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.355943,
+        "lat": 44.886673,
+        "roster": [
+            {
+                "name": "Annie Chi",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324659/breck/person_photos/mfgsdbquaolrdvv3vqoa.jpg",
+                "grade": "10",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.333123,
+        "lat": 44.975161,
+        "roster": [
+            {
+                "name": "Quincy Clark",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141507/breck/person_photos/ksrk7ofloaoiagrcrxte.jpg",
+                "grade": "Kindergarten",
+                "race": "Asian",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.333799,
+        "lat": 44.918385,
+        "roster": [
+            {
+                "name": "Cate Clemente",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141519/breck/person_photos/aic3ucl2mpwm1niqfm4y.jpg",
+                "grade": "3",
+                "race": "?",
+                "gender": "?"
+            },
+            {
+                "name": "Jack Clemente",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141396/breck/person_photos/o9rfghomklt3nfg5nbgs.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.333051,
+        "lat": 44.981009,
+        "roster": [
+            {
+                "name": "Calista Cunniff",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141392/breck/person_photos/hb4yu6k57geolj9ckpes.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.329993,
+        "lat": 44.976546,
+        "roster": [
+            {
+                "name": "Bowie Curtes",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141388/breck/person_photos/yn3nggulekkdyoltuwkf.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Finlay Curtes",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324668/breck/person_photos/of3bsbdjkc0tfxiokqsi.jpg",
+                "grade": "9",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.334363,
+        "lat": 44.910869,
+        "roster": [
+            {
+                "name": "Valerie Dusek",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141389/breck/person_photos/tr3gpoppuzqfswawyitm.jpg",
+                "grade": "6",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.346612,
+        "lat": 44.900724,
+        "roster": [
+            {
+                "name": "Maddie Dybsky",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141389/breck/person_photos/t3sexhlofxkdcrbtx6gw.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.33425,
+        "lat": 44.975853,
+        "roster": [
+            {
+                "name": "Joey Ellis",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141522/breck/person_photos/wuamrifwfuumonbbtqrg.jpg",
+                "grade": "Preschool",
+                "race": "Asian",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.344759,
+        "lat": 44.918375,
+        "roster": [
+            {
+                "name": "Leo Fauver",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324664/breck/person_photos/es1qssf4rsvgyvfualoy.jpg",
+                "grade": "9",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Ollie Fauver",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324665/breck/person_photos/hhtxubtxfqlbypkrh8cy.jpg",
+                "grade": "9",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.36303,
+        "lat": 44.914236,
+        "roster": [
+            {
+                "name": "Brooks Feldbaum",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141508/breck/person_photos/rmrgs8vwltk5msi5s40v.jpg",
+                "grade": "1",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.33451,
+        "lat": 44.98088,
+        "roster": [
+            {
+                "name": "Farrah Flamenbaum",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141402/breck/person_photos/d1spthtj10cfkvzvd1br.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Phoenix Flamenbaum",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324642/breck/person_photos/pgp8hcr84mmdg87gebfx.jpg",
+                "grade": "10",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.337963,
+        "lat": 44.913533,
+        "roster": [
+            {
+                "name": "Henry Gaillard",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324658/breck/person_photos/mrrxamf4byjyyrfarvet.jpg",
+                "grade": "12",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "William Gaillard",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324656/breck/person_photos/cnzivskxbn1j3f1biydq.jpg",
+                "grade": "10",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.335876,
+        "lat": 44.900055,
+        "roster": [
+            {
+                "name": "Bruno Geisz",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141396/breck/person_photos/vuh7ixsx2kf5urkm3eqv.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Vivian Geisz",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141391/breck/person_photos/gudavgbkkrjgllj0pa3p.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.364279,
+        "lat": 44.892103,
+        "roster": [
+            {
+                "name": "Paddy Greene",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324663/breck/person_photos/iwv6lkjdvzglt5arxyh4.jpg",
+                "grade": "12",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.478706,
+        "lat": 44.96845,
+        "roster": [
+            {
+                "name": "Arthur Hoffman",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324668/breck/person_photos/moafbnsgi9iqlwi8zhc8.jpg",
+                "grade": "10",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Georgia Hoffman",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324662/breck/person_photos/ftlknxboz4sytpjzzmfm.jpg",
+                "grade": "11",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.342539,
+        "lat": 44.917924,
+        "roster": [
+            {
+                "name": "Matea Homan",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324643/breck/person_photos/a3wbu6ibbpzdjsonzq0x.jpg",
+                "grade": "11",
+                "race": "Asian",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.344653,
+        "lat": 44.900974,
+        "roster": [
+            {
+                "name": "Eamon Hughey",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141379/breck/person_photos/wkav9wfgu50zzxc1m7tn.jpg",
+                "grade": "6",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.362771,
+        "lat": 44.906497,
+        "roster": [
+            {
+                "name": "Sam Karber",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141381/breck/person_photos/ezzqek8maqbubchstry0.jpg",
+                "grade": "8",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.330211,
+        "lat": 44.975924,
+        "roster": [
+            {
+                "name": "Emmy Knight",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141518/breck/person_photos/v4myevwu1aursj9qte30.jpg",
+                "grade": "1",
+                "race": "Black",
+                "gender": "Female"
+            },
+            {
+                "name": "Sloane Knight",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141500/breck/person_photos/livg66symbipakoithtk.jpg",
+                "grade": "Preschool",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.366032,
+        "lat": 44.915602,
+        "roster": [
+            {
+                "name": "Ava Lockhart",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324656/breck/person_photos/qphsmbwdyqbdcodqwsc6.jpg",
+                "grade": "9",
+                "race": "Indian",
+                "gender": "Female"
+            },
+            {
+                "name": "Elle Lockhart",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141388/breck/person_photos/wtavx8k9whspsweauexh.jpg",
+                "grade": "6",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Grace Lockhart",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141508/breck/person_photos/ephbngiymlyidckm0kz9.jpg",
+                "grade": "3",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.516147,
+        "lat": 44.93521,
+        "roster": [
+            {
+                "name": "Jackie Loftus",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141380/breck/person_photos/kn234hvgeonwbvfasbkj.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.261206,
+        "lat": 44.896822,
+        "roster": [
+            {
+                "name": "Kai McCarthy",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141385/breck/person_photos/iyy5zbsxeydvpkxkvmin.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Tao McCarthy",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141384/breck/person_photos/njzlxb5riqvdtjsh3zl2.jpg",
+                "grade": "8",
+                "race": "Asian",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.340384,
+        "lat": 44.917471,
+        "roster": [
+            {
+                "name": "Caden Meenan",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141522/breck/person_photos/l6hogmaqh5cinxotlnza.jpg",
+                "grade": "2",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Rory Meenan",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141525/breck/person_photos/gdzy0b4oxuvth23vfx4z.jpg",
+                "grade": "4",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.332301,
+        "lat": 44.909103,
+        "roster": [
+            {
+                "name": "Kiran Mehta",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141404/breck/person_photos/bhe9uj2caasj2uawukwf.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.36436,
+        "lat": 44.892744,
+        "roster": [
+            {
+                "name": "Lane Metcalf",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141508/breck/person_photos/dfpuzd0suu6svdlogxzr.jpg",
+                "grade": "2",
+                "race": "?",
+                "gender": "?"
+            },
+            {
+                "name": "Olivia Metcalf",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141397/breck/person_photos/h9dtblokwc6a037fdd7t.jpg",
+                "grade": "6",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.348889,
+        "lat": 44.918164,
+        "roster": [
+            {
+                "name": "Sebastian Mudra",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141512/breck/person_photos/tjko2y0rsrqv9vnm9ua9.jpg",
+                "grade": "Kindergarten",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.342697,
+        "lat": 44.915176,
+        "roster": [
+            {
+                "name": "Anna Murphy",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141393/breck/person_photos/hcvrosqo7jtcnhczf6ma.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.335664,
+        "lat": 44.919443,
+        "roster": [
+            {
+                "name": "Isa Oppedisano",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141524/breck/person_photos/ry5aknx3cok1iznrjlgy.jpg",
+                "grade": "2",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.402974,
+        "lat": 44.935302,
+        "roster": [
+            {
+                "name": "Danny Paster",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324656/breck/person_photos/l4c3bxk62a3q9yxxlt8w.jpg",
+                "grade": "10",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Drew Paster",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141395/breck/person_photos/ofrbsi54e48bk7mw1ngt.jpg",
+                "grade": "8",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Ethan Paster",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324656/breck/person_photos/j0jv1pkjfh1256d2l4dl.jpg",
+                "grade": "12",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.376379,
+        "lat": 44.909529,
+        "roster": [
+            {
+                "name": "Isaac Pohlad",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141519/breck/person_photos/vqayzsgo45gyzcembdcl.jpg",
+                "grade": "1",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Noah Pohlad",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141512/breck/person_photos/avyz0exd7ntthorcc7mg.jpg",
+                "grade": "3",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Sam Pohlad",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141396/breck/person_photos/c8qsjwygztoqvdzwmqk4.jpg",
+                "grade": "6",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.340578,
+        "lat": 44.913864,
+        "roster": [
+            {
+                "name": "Matty Rogers",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141514/breck/person_photos/afridplj4lskseffqtqc.jpg",
+                "grade": "3",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.335458,
+        "lat": 44.919442,
+        "roster": [
+            {
+                "name": "Elsa Schillinger",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141526/breck/person_photos/aoomqxeyo6ow7d8wjioe.jpg",
+                "grade": "Kindergarten",
+                "race": "?",
+                "gender": "?"
+            },
+            {
+                "name": "Linus Schillinger",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141402/breck/person_photos/d8m9bsa7jnqlbkmf00b4.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.332903,
+        "lat": 44.909516,
+        "roster": [
+            {
+                "name": "Greta Schulz",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141515/breck/person_photos/burf3lot9wxe7ojitgep.jpg",
+                "grade": "3",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Otto Schulz",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141397/breck/person_photos/wxxo2pqzyc51hpy9r5to.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.336219,
+        "lat": 44.896699,
+        "roster": [
+            {
+                "name": "Misa So",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324662/breck/person_photos/bwnlp0hh1wfrqcig3nax.jpg",
+                "grade": "9",
+                "race": "Asian",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.338987,
+        "lat": 44.914911,
+        "roster": [
+            {
+                "name": "Damon Sparling",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141506/breck/person_photos/wm91jaaqncuqkem4idkf.jpg",
+                "grade": "1",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Everett Sparling",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141385/breck/person_photos/dajvvkt2mkqo5de5zkxb.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.329194,
+        "lat": 44.975678,
+        "roster": [
+            {
+                "name": "Frances Strahan",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1695324656/breck/person_photos/bdzjopbalmkrmp8hrzco.jpg",
+                "grade": "12",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Joseph Strahan",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141501/breck/person_photos/muwazknd0sj7cibchjkd.jpg",
+                "grade": "3",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "William Strahan",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141520/breck/person_photos/qzm1lupnkg6mjdz2fvhd.jpg",
+                "grade": "Preschool",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    },
+    {
+        "lon": -93.370195,
+        "lat": 44.913712,
+        "roster": [
+            {
+                "name": "Avery Szerda",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141504/breck/person_photos/alaihuumdnnfnuudbuyt.jpg",
+                "grade": "4",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.333171,
+        "lat": 44.914965,
+        "roster": [
+            {
+                "name": "Vansh Varma",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141402/breck/person_photos/r0fpx71hhvwtxhkxc1in.jpg",
+                "grade": "8",
+                "race": "Indian",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.337099,
+        "lat": 44.910681,
+        "roster": [
+            {
+                "name": "Avery Walter",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141390/breck/person_photos/ohyatslojrkpkwtcigoq.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Drew Walter",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141384/breck/person_photos/eaalqlw4psumyzzqerh0.jpg",
+                "grade": "7",
+                "race": "White",
+                "gender": "Male"
+            },
+            {
+                "name": "Emma Walter",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141389/breck/person_photos/gghbyebem8nvpzllhn3y.jpg",
+                "grade": "5",
+                "race": "White",
+                "gender": "Male"
+            }
+        ]
+    },
+    {
+        "lon": -93.34023,
+        "lat": 44.903361,
+        "roster": [
+            {
+                "name": "Tess Ward",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141507/breck/person_photos/unhtxwzps4xdkpp4ncly.jpg",
+                "grade": "4",
+                "race": "White",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.341802,
+        "lat": 44.91736,
+        "roster": [
+            {
+                "name": "Vivian Yang",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141402/breck/person_photos/bolui2umbg1ztg7i1f9m.jpg",
+                "grade": "7",
+                "race": "Asian",
+                "gender": "Female"
+            }
+        ]
+    },
+    {
+        "lon": -93.331722,
+        "lat": 44.962516,
+        "roster": [
+            {
+                "name": "Maeve Ziskin",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141504/breck/person_photos/snf6cus0q6fafc9p467l.jpg",
+                "grade": "3",
+                "race": "White",
+                "gender": "Female"
+            },
+            {
+                "name": "Penny Ziskin",
+                "photo": "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1697141527/breck/person_photos/xqvo4evkck4996prwlux.jpg",
+                "grade": "Kindergarten",
+                "race": "?",
+                "gender": "?"
+            }
+        ]
+    }
+];
+        let params = (new URL(document.location)).searchParams;
+        if (document.getElementById('title').innerText == "")
+            document.getElementById('title').innerText = params.get("t");
+        // Replace with your own Mapbox Access Token
+        if (embeddedData == null)
+            data = JSON.parse(params.get("l"));
+        else
+            data = embeddedData
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibGljYTg4IiwiYSI6ImNsbmxiZ3prZzBwb2Yyc3BtNGxzNTNzdmEifQ.DVf5b_-9yup8YZFlG5wQeg';
+        // mapboxgl.accessToken = '';
+        // Define the list of coordinates (longitude, latitude)
+        coordinates = data;
+
+        let lat = 0;
+        let lon = 0;
+        data.forEach(r => {
+            lon+=r.lon;
+            lat+=r.lat;
+        });
+
+        center = [lon/data.length, lat/data.length];
+        // Initialize the map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11', // You can choose a different style
+            center: center, // Set the initial center of the map
+            zoom: 10, // Set the initial zoom level
+        });
+        map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.FullscreenControl());
+        // Add markers to the map for each coordinate
+        data.forEach(r => {
+            html = ""
+            r.roster.forEach(p => {
+                html += `
+                <div class="image-cropper">
+                    <img src=${p.photo} alt="Photo of ${p.name}">
+                </div>
+                <p>${p.name}, Grade ${p.grade}</p>
+                <br/>
+                `
+            })
+            new mapboxgl.Marker()
+                .setLngLat([r.lon, r.lat])
+                .setPopup(new mapboxgl.Popup().setHTML(html))
+                .addTo(map);
+        });
+    </script>
+</body>
+</html>

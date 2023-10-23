@@ -32,12 +32,24 @@
 <body>
     <h1 id='title'></h1>
     <div id='map'></div>
-
+    <p>Each pin on the map represents an address. Click on the pin to get a list of the students who are associated with the address, their grades, and their estimated race/gender.</p>
+    <p>Disclaimer: Race/gender data was estimated by the FairFace machine learning model using Veracross photos. As a result, there are errors and gaps in this aspect of the data. Self-reported information would be much more accurate.</p>
+    <h3>Created using:</h3>
+    <ul>
+        <li>Ehrman-Solberg, Kevin; Petersen, Penny; Mills, Marguerite; Delegard, Kirsten; Mattke, Ryan. (2020). Racial Covenants in Hennepin County. Retrieved from the Data Repository for the University of Minnesota, https://doi.org/10.13020/a88t-yb14.</li>
+        <li>Karkkainen, Kimmo and Joo, Jungseock. "FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age for Bias Measurement and Mitigation."  *Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision*, 2021. Pg 1528-1558</li>
+        <li>Mapbox GL JS API</li>
+    </ul>
     <script>
+        let embeddedData = null;
         let params = (new URL(document.location)).searchParams;
-        document.getElementById('title').innerText = params.get("t");
+        if (document.getElementById('title').innerText == "")
+            document.getElementById('title').innerText = params.get("t");
         // Replace with your own Mapbox Access Token
-        let data = JSON.parse(params.get("l"));
+        if (embeddedData == null)
+            data = JSON.parse(params.get("l"));
+        else
+            data = embeddedData
 
         mapboxgl.accessToken = 'pk.eyJ1IjoibGljYTg4IiwiYSI6ImNsbmxiZ3prZzBwb2Yyc3BtNGxzNTNzdmEifQ.DVf5b_-9yup8YZFlG5wQeg';
         // mapboxgl.accessToken = '';
