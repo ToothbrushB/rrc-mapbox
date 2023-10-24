@@ -1,95 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
-    <title>Restrictive Racial Covenants Map</title>
-    <style>
-        /* Add some styles for the map container */
-        #map {
-            width: 100%;
-            height: 400px;
-        }
-        .image-cropper {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 50%;
-        }
-
-        img {
-            display: inline;
-            margin: 0 auto;
-            height: 100px;
-            width: 100px;
-            object-fit: cover;
-            object-position: center -10px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRCs at Breck</title>
 </head>
+
 <body>
-    <h1 id='title'></h1>
-    <div id='map'></div>
-    <p>Each pin on the map represents an address. Click on the pin to get a list of the students who are associated with the address, their grades, and their estimated race/gender.</p>
-    <p>Disclaimer: Race/gender data was estimated by the FairFace machine learning model using Veracross photos. As a result, there are errors and gaps in this aspect of the data. Self-reported information would be much more accurate.</p>
-    <h3>Created using:</h3>
+    <h1>Restrictive Racial Covenants at Breck</h1>
+    <p>Names, faces, grades, and addresses were from the digital student directory and processed with racial covenant
+        data.</p>
+    <p>Directory data was taken 10/16/2023. It was subject to the following processing:</p>
     <ul>
-        <li>Ehrman-Solberg, Kevin; Petersen, Penny; Mills, Marguerite; Delegard, Kirsten; Mattke, Ryan. (2020). Racial Covenants in Hennepin County. Retrieved from the Data Repository for the University of Minnesota, https://doi.org/10.13020/a88t-yb14.</li>
-        <li>Karkkainen, Kimmo and Joo, Jungseock. "FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age for Bias Measurement and Mitigation."  *Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision*, 2021. Pg 1528-1558</li>
-        <li>Mapbox GL JS API</li>
+        <li>
+            Filtered out addresses outside MN
+        </li>
+        <li>Removed duplicates (e.g. 2 units at the same apartment complex)
+        </li>
+        <li>Removed PO Boxes
+        </li>
+        <li>Parsed the address for street address, city, and zipcode</li>
     </ul>
-    <script>
-        let embeddedData = null;
-        let params = (new URL(document.location)).searchParams;
-        if (document.getElementById('title').innerText == "")
-            document.getElementById('title').innerText = params.get("t");
-        // Replace with your own Mapbox Access Token
-        if (embeddedData == null)
-            data = JSON.parse(params.get("l"));
-        else
-            data = embeddedData
-
-        mapboxgl.accessToken = 'pk.eyJ1IjoibGljYTg4IiwiYSI6ImNsbmxiZ3prZzBwb2Yyc3BtNGxzNTNzdmEifQ.DVf5b_-9yup8YZFlG5wQeg';
-        // mapboxgl.accessToken = '';
-        // Define the list of coordinates (longitude, latitude)
-        coordinates = data;
-
-        let lat = 0;
-        let lon = 0;
-        data.forEach(r => {
-            lon+=r.lon;
-            lat+=r.lat;
-        });
-
-        center = [lon/data.length, lat/data.length];
-        // Initialize the map
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11', // You can choose a different style
-            center: center, // Set the initial center of the map
-            zoom: 10, // Set the initial zoom level
-        });
-        map.addControl(new mapboxgl.NavigationControl());
-        map.addControl(new mapboxgl.FullscreenControl());
-        // Add markers to the map for each coordinate
-        data.forEach(r => {
-            html = ""
-            r.roster.forEach(p => {
-                html += `
-                <div class="image-cropper">
-                    <img src=${p.photo} alt="Photo of ${p.name}">
-                </div>
-                <p>${p.name}, Grade ${p.grade}</p>
-                <br/>
-                `
-            })
-            new mapboxgl.Marker()
-                .setLngLat([r.lon, r.lat])
-                .setPopup(new mapboxgl.Popup().setHTML(html))
-                .addTo(map);
-        });
-    </script>
+    <p>Each student in the directory was mapped to their address(es). The FairFace machine learning model was used to
+        process directory photos to estimate each student's race and gender.</p>
+    <p>A list of addresses that also appeared in the racial covenant data was generated. The combination of address,
+        person, and race data was synthesized into a map.</p>
+    <p>Click the links below to see these maps:</p>
+    <a href="has_covenant.html">Breck homes with RRCs on them</a><br>
+    <a href="same_street.html">Breck homes on a street with RRCs</a><br>
+    <a href="all_students.html">All Breck homes</a>
 </body>
+
 </html>
