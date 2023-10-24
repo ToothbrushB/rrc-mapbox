@@ -13364,7 +13364,7 @@
             }
         ]
     }
-];
+];    
         let params = (new URL(document.location)).searchParams;
         if (document.getElementById('title').innerText == "")
             document.getElementById('title').innerText = params.get("t");
@@ -13399,6 +13399,12 @@
         // Add markers to the map for each coordinate
         data.forEach(r => {
             html = ""
+            if (r['text']) {
+                html+=`
+                <p>RRC year: ${r.year}</p>
+                <p>${r.text}</p>
+                `;
+            }
             r.roster.forEach(p => {
                 html += `
                 <div class="image-cropper">

@@ -76,6 +76,12 @@
         // Add markers to the map for each coordinate
         data.forEach(r => {
             html = ""
+            if (r['text']) {
+                html+=`
+                <p>RRC year: ${r.year}</p>
+                <p>${r.text}</p>
+                `;
+            }
             r.roster.forEach(p => {
                 html += `
                 <div class="image-cropper">
