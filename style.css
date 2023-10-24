@@ -1,0 +1,47 @@
+ /* Add some styles for the map container */
+ #map {
+    width: 100%;
+    height: 600px;
+    border: 10px;
+}
+.image-cropper {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.image-cropper>img {
+    display: inline;
+    margin: 0 auto;
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    object-position: center -10px;
+}
+
+figure {
+    display: block;
+    text-align: center;
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    display: block;
+}
+p {
+    font-size: 12pt;
+}
+h1 {
+    font-size: large;
+}
+
+footer {
+    bottom: 100%;
+    text-align: center;
+    font-size: small;
+}
+.person {
+    margin: 5px;
+}
